@@ -1,8 +1,8 @@
-package me.reporte.crudspring.enums.converters;
+package me.reporte.course.enums.converters;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import me.reporte.crudspring.enums.CategoryEnum;
+import me.reporte.course.enums.CategoryEnum;
 
 import java.util.stream.Stream;
 

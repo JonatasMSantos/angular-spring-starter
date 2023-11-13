@@ -1,4 +1,4 @@
-package me.reporte.crudspring.enums;
+package me.reporte.course.enums;
 
 public enum CategoryEnum {
     BACKEND("back-end"), 

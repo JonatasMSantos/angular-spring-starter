@@ -1,4 +1,4 @@
-package me.reporte.crudspring.service;
+package me.reporte.course;
 
 import java.util.List;
 
@@ -13,12 +13,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import me.reporte.crudspring.dto.CourseDTO;
-import me.reporte.crudspring.dto.CoursePageDTO;
-import me.reporte.crudspring.dto.mapper.CourseMapper;
-import me.reporte.crudspring.exception.RecordNotFoundException;
-import me.reporte.crudspring.model.Course;
-import me.reporte.crudspring.repository.CourseRepository;
+import me.reporte.course.dto.CourseDTO;
+import me.reporte.course.dto.CoursePageDTO;
+import me.reporte.course.dto.mapper.CourseMapper;
+import me.reporte.exception.RecordNotFoundException;
+import me.reporte.course.model.Course;
 
 @Validated
 @Service

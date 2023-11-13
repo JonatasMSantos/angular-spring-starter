@@ -1,4 +1,4 @@
-package me.reporte.crudspring.enums.validation;
+package me.reporte.shared.validation;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;

@@ -1,4 +1,4 @@
-package me.reporte.crudspring.dto;
+package me.reporte.course.dto;
 
 import org.hibernate.validator.constraints.Length;
 

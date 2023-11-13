@@ -1,14 +1,14 @@
-package me.reporte.crudspring.dto.mapper;
+package me.reporte.course.dto.mapper;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import me.reporte.crudspring.dto.CourseDTO;
-import me.reporte.crudspring.dto.LessonDTO;
-import me.reporte.crudspring.enums.CategoryEnum;
-import me.reporte.crudspring.model.Course;
-import me.reporte.crudspring.model.Lesson;
+import me.reporte.course.dto.CourseDTO;
+import me.reporte.course.dto.LessonDTO;
+import me.reporte.course.enums.CategoryEnum;
+import me.reporte.course.model.Course;
+import me.reporte.course.model.Lesson;
 
 @Component
 public class CourseMapper {

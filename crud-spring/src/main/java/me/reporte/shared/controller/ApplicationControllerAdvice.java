@@ -1,4 +1,4 @@
-package me.reporte.crudspring.exception;
+package me.reporte.shared.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.validation.ConstraintViolationException;
+import me.reporte.exception.RecordNotFoundException;
 
 @RestControllerAdvice
 public class ApplicationControllerAdvice {
@@ -43,6 +44,6 @@ public class ApplicationControllerAdvice {
             String typeName = typeParts[typeParts.length - 1];
             return ex.getName() + " should be of type " + typeName;
         }
-        return "Argument type not valid";
+        return "Argument type not valid"; 
     }
 }

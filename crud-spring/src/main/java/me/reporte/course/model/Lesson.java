@@ -1,4 +1,4 @@
-package me.reporte.crudspring.model;
+package me.reporte.course.model;
 
 import org.hibernate.validator.constraints.Length;
 

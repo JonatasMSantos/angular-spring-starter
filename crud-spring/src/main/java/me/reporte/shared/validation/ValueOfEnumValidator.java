@@ -1,4 +1,4 @@
-package me.reporte.crudspring.enums.validation;
+package me.reporte.shared.validation;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,7 +1,7 @@
-package me.reporte.crudspring.controller;
+package me.reporte.course;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.validation.annotation.Validated; 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +18,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import me.reporte.crudspring.dto.CourseDTO;
-import me.reporte.crudspring.dto.CoursePageDTO;
-import me.reporte.crudspring.service.CourseService;
+import me.reporte.course.dto.CourseDTO;
+import me.reporte.course.dto.CoursePageDTO;
 
 @Validated
 @RestController

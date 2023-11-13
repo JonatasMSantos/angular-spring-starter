@@ -1,14 +1,14 @@
-package me.reporte.crudspring;
+package me.reporte;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import me.reporte.crudspring.enums.CategoryEnum;
-import me.reporte.crudspring.model.Course;
-import me.reporte.crudspring.model.Lesson;
-import me.reporte.crudspring.repository.CourseRepository;
+import me.reporte.course.CourseRepository;
+import me.reporte.course.enums.CategoryEnum;
+import me.reporte.course.model.Course;
+import me.reporte.course.model.Lesson;
 
 @SpringBootApplication
 public class CrudSpringApplication {
@@ -16,7 +16,7 @@ public class CrudSpringApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CrudSpringApplication.class, args);
 	}
-
+ 
 	@Bean
 	CommandLineRunner initDataBase(CourseRepository courseRepository) {
 		return args -> {

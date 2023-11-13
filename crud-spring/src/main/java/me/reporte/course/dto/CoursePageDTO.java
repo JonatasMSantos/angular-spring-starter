@@ -1,4 +1,4 @@
-package me.reporte.crudspring.dto;
+package me.reporte.course.dto;
 import java.util.List;
 
 public record CoursePageDTO(List<CourseDTO> courses, long totalElements, int totalPages) {

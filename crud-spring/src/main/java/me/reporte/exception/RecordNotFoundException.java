@@ -1,4 +1,4 @@
-package me.reporte.crudspring.exception;
+package me.reporte.exception;
 
 public class RecordNotFoundException extends RuntimeException {
 

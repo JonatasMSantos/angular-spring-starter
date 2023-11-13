@@ -1,10 +1,13 @@
 package me.reporte.course.dto.mapper;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import me.reporte.course.dto.CourseDTO;
+import me.reporte.course.dto.CourseRequestDTO;
 import me.reporte.course.dto.LessonDTO;
 import me.reporte.course.enums.CategoryEnum;
 import me.reporte.course.model.Course;
@@ -16,35 +19,31 @@ public class CourseMapper {
         if (course == null) {
             return null;
         }
-
-        List<LessonDTO> lessons = course.getLessons().stream()
+        List<LessonDTO> lessonDTOList = course.getLessons()
+                .stream()
                 .map(lesson -> new LessonDTO(lesson.getId(), lesson.getName(), lesson.getUrl()))
                 .toList();
-
-        return new CourseDTO(course.getId(), course.getName(), course.getCategory().getValue(), lessons);
+        return new CourseDTO(course.getId(), course.getName(), course.getCategory().getValue(),
+                lessonDTOList);
     }
 
-    public Course toEntity(CourseDTO courseDTO) {
-        if (courseDTO == null) {
-            return null;
-        }
+    public Course toModel(CourseRequestDTO courseRequestDTO) {
+
         Course course = new Course();
-        if (courseDTO.id() != null) {
-            course.setId(courseDTO.id());
-        }
-        course.setName(courseDTO.name());
-        course.setCategory(convertCategoryValue(courseDTO.category()));
+        course.setName(courseRequestDTO.name());
+        course.setCategory(convertCategoryValue(courseRequestDTO.category()));
 
-
-        List<Lesson> lessons = courseDTO.lessons().stream().map(lessonDTO -> {
-            var lesson = new Lesson();
-            lesson.setId(lessonDTO.id());
-            lesson.setName(lessonDTO.name());
-            lesson.setUrl(lessonDTO.url());
-            lesson.setCourse(course);
-            return lesson;
-        }).toList();
-
+        Set<Lesson> lessons = courseRequestDTO.lessons().stream()
+                .map(lessonDTO -> {
+                    Lesson lesson = new Lesson();
+                    if (lesson.getId() > 0) {
+                        lesson.setId(lessonDTO.id());
+                    }
+                    lesson.setName(lessonDTO.name());
+                    lesson.setUrl(lessonDTO.url());
+                    lesson.setCourse(course);
+                    return lesson;
+                }).collect(Collectors.toSet());
         course.setLessons(lessons);
 
         return course;
@@ -59,5 +58,13 @@ public class CourseMapper {
             case "back-end" -> CategoryEnum.BACKEND;
             default -> throw new IllegalArgumentException("invalid category");
         };
+    }
+
+    public Lesson convertLessonDTOToLesson(LessonDTO lessonDTO) {
+        Lesson lesson = new Lesson();
+        lesson.setId(lessonDTO.id());
+        lesson.setName(lessonDTO.name());
+        lesson.setUrl(lessonDTO.url());
+        return lesson;
     }
 }

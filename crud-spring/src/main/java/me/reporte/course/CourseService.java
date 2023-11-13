@@ -6,18 +6,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import me.reporte.course.dto.CourseDTO;
 import me.reporte.course.dto.CoursePageDTO;
+import me.reporte.course.dto.CourseRequestDTO;
+import me.reporte.course.dto.LessonDTO;
 import me.reporte.course.dto.mapper.CourseMapper;
-import me.reporte.exception.RecordNotFoundException;
 import me.reporte.course.model.Course;
+import me.reporte.course.model.Lesson;
+import me.reporte.exception.BusinessException;
+import me.reporte.exception.RecordNotFoundException;
 
 @Validated
 @Service
@@ -31,36 +35,80 @@ public class CourseService {
         this.courseMapper = courseMapper;
     }
 
-    public CoursePageDTO list(@PositiveOrZero int page, @Positive @Max(100) int pageSize) {
-        Page<Course> pageCourse = courseRepository.findAll(PageRequest.of(page, pageSize));
-        List<CourseDTO> courses = pageCourse.get().map(courseMapper::toDTO).toList();
-        return new CoursePageDTO(courses, pageCourse.getTotalElements(), pageCourse.getTotalPages());
+    public CoursePageDTO findAll(@PositiveOrZero int page, @Positive @Max(1000) int pageSize) {
+        Page<Course> coursePage = courseRepository.findAll(PageRequest.of(page, pageSize));
+        List<CourseDTO> list = coursePage.getContent().stream()
+                .map(courseMapper::toDTO)
+                .toList();
+        return new CoursePageDTO(list, coursePage.getTotalElements(), coursePage.getTotalPages());
     }
 
-    public CourseDTO findById(@NotNull @Positive Long id) {
-        return courseRepository.findById(id)
-                .map(courseMapper::toDTO)
+    public List<CourseDTO> findByName(@NotNull @NotBlank String name) {
+        return courseRepository.findByName(name).stream().map(courseMapper::toDTO).toList();
+    }
+
+    public CourseDTO findById(@Positive @NotNull Long id) {
+        return courseRepository.findById(id).map(courseMapper::toDTO)
                 .orElseThrow(() -> new RecordNotFoundException(id));
     }
 
-    public CourseDTO create(@Valid @NotNull CourseDTO course) {
-        return courseMapper.toDTO(courseRepository.save(courseMapper.toEntity(course)));
+    public CourseDTO create(@Valid CourseRequestDTO courseRequestDTO) {
+        courseRepository.findByName(courseRequestDTO.name()).stream()
+                .filter(Course::isVisible)
+                .findAny().ifPresent(c -> {
+                    throw new BusinessException("A course with name " + courseRequestDTO.name() + " already exists.");
+                });
+        Course course = courseMapper.toModel(courseRequestDTO);
+        course.setVisible(true);
+        return courseMapper.toDTO(courseRepository.save(course));
     }
 
-    public CourseDTO update(@NotNull @Positive Long id, @RequestBody @Valid @NotNull CourseDTO courseDTO) {
-        return courseRepository.findById(id).map(recordFound -> {
-            Course course = courseMapper.toEntity(courseDTO);
-            recordFound.setName(courseDTO.name());
-            recordFound.setCategory(courseMapper.convertCategoryValue(courseDTO.category()));
-            recordFound.getLessons().clear();
-            course.getLessons().forEach(recordFound.getLessons()::add);
-            return courseMapper.toDTO(courseRepository.save(recordFound));
-        }).orElseThrow(() -> new RecordNotFoundException(id));
+    public CourseDTO update(@Positive @NotNull Long id, @Valid CourseRequestDTO courseRequestDTO) {
+        return courseRepository.findById(id).map(actual -> {
+            actual.setName(courseRequestDTO.name());
+            actual.setCategory(courseMapper.convertCategoryValue(courseRequestDTO.category()));
+            mergeLessonsForUpdate(actual, courseRequestDTO);
+            return courseMapper.toDTO(courseRepository.save(actual));
+        })
+                .orElseThrow(() -> new RecordNotFoundException(id));
     }
 
-    public void delete(@NotNull @Positive Long id) {
-        courseRepository.delete(courseRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException(id)));
+    private void mergeLessonsForUpdate(Course updatedCourse, CourseRequestDTO courseRequestDTO) {
+
+        // find the lessons that were removed
+        if (updatedCourse.getLessons() != null && !updatedCourse.getLessons().isEmpty()) {
+
+            List<Lesson> lessonsToRemove = updatedCourse.getLessons().stream().filter(lesson -> {
+                LessonDTO found = courseRequestDTO.lessons().stream()
+                        .filter(lessonDTO -> lessonDTO.id() != null && lessonDTO.id() > 0 && lessonDTO.id().equals(lesson.getId()))
+                        .findFirst().orElse(null);
+
+                return found == null;
+            }).toList();
+
+            lessonsToRemove.forEach(updatedCourse::removeLesson);
+
+        }
+
+        courseRequestDTO.lessons().forEach(lessonDto -> {
+            // new lesson, add it
+            if (lessonDto.id() == null || lessonDto.id() == 0) {
+                updatedCourse.addLesson(courseMapper.convertLessonDTOToLesson(lessonDto));
+            } else {
+                // existing lesson, find it and update
+                updatedCourse.getLessons().stream()
+                        .filter(lesson -> lesson.getId().equals(lessonDto.id()))
+                        .findAny()
+                        .ifPresent(lesson -> {
+                            lesson.setName(lessonDto.name());
+                            lesson.setUrl(lessonDto.url());
+                        });
+            }
+        });
+    }
+
+    public void delete(@Positive @NotNull Long id) {
+        courseRepository.delete(courseRepository.findById(id).orElseThrow(() -> new RecordNotFoundException(id)));
     }
 
 }
